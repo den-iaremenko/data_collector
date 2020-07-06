@@ -142,6 +142,6 @@ if __name__ == "__main__":
     while True:
         curr_datetime = datetime.now()
         logger.info(f"Current time: {curr_datetime.hour}:{curr_datetime.minute}:{curr_datetime.second}")
-        if curr_datetime.hour == 9 or curr_datetime.hour == 18:
+        if curr_datetime.hour == 11 or curr_datetime.hour == 18:
             run()
         sleep(min_to_wait)
