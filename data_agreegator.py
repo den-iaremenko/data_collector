@@ -138,10 +138,11 @@ def get_nbu_data():
 
 
 if __name__ == "__main__":
-    min_to_wait = 60 * 60
-    while True:
-        curr_datetime = datetime.now()
-        logger.info(f"Current time: {curr_datetime.hour}:{curr_datetime.minute}:{curr_datetime.second}")
-        if curr_datetime.hour == 11 or curr_datetime.hour == 18:
-            run()
-        sleep(min_to_wait)
+    run()
+    # min_to_wait = 60 * 60
+    # while True:
+    #     curr_datetime = datetime.now()
+    #     logger.info(f"Current time: {curr_datetime.hour}:{curr_datetime.minute}:{curr_datetime.second}")
+    #     if curr_datetime.hour == 11 or curr_datetime.hour == 18:
+    #         run()
+    #     sleep(min_to_wait)
