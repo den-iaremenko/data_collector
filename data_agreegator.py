@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from time import sleep, time
 from datetime import datetime
 from loguru import logger
+from git import Repo
 
 
 class CsvFiles:
@@ -42,6 +43,7 @@ def run():
         write_to_csv(csv_files.nbu, csv_files.nbu_fields(), nbu_data)
     write_to_csv(csv_files.ukrsib, csv_files.ukrsib_fields(), ukrsib_data)
     write_to_csv(csv_files.dou, csv_files.dou_fields(), dou_data)
+    git_push()
 
 
 def create_col_names(file_name, field_names):
@@ -56,6 +58,19 @@ def write_to_csv(file_name, field_names, data_to_write):
         writer = csv.DictWriter(csvfile, fieldnames=field_names)
         writer.writerow(data_to_write)
         csvfile.close()
+
+
+def git_push():
+    PATH_OF_GIT_REPO = r'.git'  # make sure .git folder is properly configured
+    COMMIT_MESSAGE = 'new data'
+    try:
+        repo = Repo(PATH_OF_GIT_REPO)
+        repo.git.add(update=True)
+        repo.index.commit(COMMIT_MESSAGE)
+        origin = repo.remote(name='origin')
+        origin.push()
+    except:
+        print('Some error occured while pushing the code')
 
 
 def get_data_from_dou():
@@ -142,6 +157,6 @@ if __name__ == "__main__":
     while True:
         curr_datetime = datetime.now()
         logger.info(f"Current time: {curr_datetime.hour}:{curr_datetime.minute}:{curr_datetime.second}")
-        if curr_datetime.hour == 11 or curr_datetime.hour == 14 or curr_datetime.hour == 18:
+        if curr_datetime.hour == 11 or curr_datetime.hour == 14 or curr_datetime.hour == 18 or curr_datetime.hour == 23:
             run()
         sleep(min_to_wait)
