@@ -69,8 +69,9 @@ def git_push():
         repo.index.commit(COMMIT_MESSAGE)
         origin = repo.remote(name='origin')
         origin.push()
+        logger.info("All Data is pushed")
     except:
-        print('Some error occured while pushing the code')
+        logger.warning("Some error occured while pushing the code")
 
 
 def get_data_from_dou():
@@ -157,6 +158,6 @@ if __name__ == "__main__":
     while True:
         curr_datetime = datetime.now()
         logger.info(f"Current time: {curr_datetime.hour}:{curr_datetime.minute}:{curr_datetime.second}")
-        if curr_datetime.hour == 11 or curr_datetime.hour == 14 or curr_datetime.hour == 18 or curr_datetime.hour == 23:
+        if curr_datetime.hour == 11 or curr_datetime.hour == 14 or curr_datetime.hour == 18:
             run()
         sleep(min_to_wait)
