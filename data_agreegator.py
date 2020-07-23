@@ -11,6 +11,7 @@ from git import Repo
 date = datetime.now()
 logger.add(f"file_{date.day}_{date.month}_{date.hour}_{date.minute}.log", retention="10 days")
 
+
 class CsvFiles:
 
     def __init__(self):
