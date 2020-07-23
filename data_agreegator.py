@@ -7,8 +7,9 @@ from datetime import datetime
 from loguru import logger
 from git import Repo
 
-date = datetime.now()
-logger.add(f"file_{date.day}_{date.month}_{date.hour}_{date.minute}.log", retention="10 days")
+
+# date = datetime.now()
+# logger.add(f"file_{date.day}_{date.month}_{date.hour}_{date.minute}.log", retention="10 days")
 
 class CsvFiles:
 
@@ -19,7 +20,7 @@ class CsvFiles:
 
     @staticmethod
     def dou_fields():
-        return ['t', 'java', '.net', 'php', 'c++', 'qa',
+        return ['t', "h_t", 'java', '.net', 'php', 'c++', 'qa',
                 'project manager', 'product manager', 'analyst',
                 'за рубежом', 'python', 'ruby', 'ios/macos',
                 'android', 'front end', 'дизайн', 'маркетинг',
@@ -27,11 +28,11 @@ class CsvFiles:
 
     @staticmethod
     def nbu_fields():
-        return ["t", "e", "d"]
+        return ["t", "h_t", "e", "d"]
 
     @staticmethod
     def ukrsib_fields():
-        return ["t", "e", "d", "e_card", "d_card"]
+        return ["h_t", "t", "e_b", "e_s", "d_b", "d_s", "e_card_b", "e_card_s", "d_card_b", "d_card_s"]
 
 
 csv_files = CsvFiles()
@@ -78,7 +79,8 @@ def git_push():
 
 def get_data_from_dou():
     dou = {
-        "t": int(time()),
+        "h_t": datetime.now(),
+        "t": time(),
     }
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
@@ -96,18 +98,22 @@ def get_data_from_dou():
 
 
 def get_ukrsib():
-
     def get_values(parent_element):
         buy = parent_element.find(class_="rate__buy").find("p").text.replace("'", "").strip()
         sale = parent_element.find(class_="rate__sale").find("p").text.replace("'", "").strip()
         return [buy, sale]
 
     ukrsib = {
-        "t": int(time()),
-        "e": [],
-        "d": [],
-        "e_card": [],
-        "d_card": [],
+        "h_t": datetime.now(),
+        "t": time(),
+        "e_b": 0,
+        "e_s": 0,
+        "d_b": 0,
+        "d_s": 0,
+        "e_card_b": 0,
+        "e_card_s": 0,
+        "d_card_b": 0,
+        "d_card_s": 0,
     }
     data = requests.get("https://my.ukrsibbank.com/en/personal/")
     data = BeautifulSoup(data.content, "html.parser")
@@ -115,17 +121,22 @@ def get_ukrsib():
     euro_nal = data.find(id="NALEUR")
     usd_card = data.find(id="BNUAHUSD")
     euro_card = data.find(id="BNUAHEUR")
-    ukrsib["d"] = get_values(usd_nal)
-    ukrsib["e"] = get_values(euro_nal)
-    ukrsib["e_card"] = get_values(euro_card)
-    ukrsib["d_card"] = get_values(usd_card)
+    ukrsib["d_b"] = float(get_values(usd_nal)[0])
+    ukrsib["d_s"] = float(get_values(usd_nal)[1])
+    ukrsib["e_b"] = float(get_values(euro_nal)[0])
+    ukrsib["e_s"] = float(get_values(euro_nal)[1])
+    ukrsib["e_card_b"] = float(get_values(euro_card)[0])
+    ukrsib["e_card_s"] = float(get_values(euro_card)[1])
+    ukrsib["d_card_b"] = float(get_values(usd_card)[0])
+    ukrsib["d_card_s"] = float(get_values(usd_card)[1])
     logger.info(ukrsib)
     return ukrsib
 
 
 def get_nbu_data():
     nbu = {
-        "t": int(time()),
+        "h_t": datetime.now(),
+        "t": time(),
         "e": None,
         "d": None
     }
@@ -149,17 +160,60 @@ def get_nbu_data():
     for col_data in all_left_cols:
         if col_data.find(class_="value-full"):
             current_values.append(col_data.find(class_="value-full").find("small").text)
-    nbu["e"] = current_values[0].strip()
-    nbu["d"] = current_values[1].strip()
+    nbu["e"] = float(current_values[0].replace(",", ".").strip())
+    nbu["d"] = float(current_values[1].replace(",", ".").strip())
     logger.info(nbu)
     return nbu
 
 
 if __name__ == "__main__":
-    min_to_wait = 60 * 60
+    sec_to_wait = 60
     while True:
         curr_datetime = datetime.now()
         logger.info(f"Current time: {curr_datetime.hour}:{curr_datetime.minute}:{curr_datetime.second}")
-        if curr_datetime.hour == 11 or curr_datetime.hour == 14 or curr_datetime.hour == 18:
+        if curr_datetime.hour == 11 \
+                or curr_datetime.hour == 14 \
+                or curr_datetime.hour == 17 \
+                and curr_datetime.minute == 11:
             run()
-        sleep(min_to_wait)
+        sleep(sec_to_wait)
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # create_col_names("ukrsib.csv", CsvFiles.ukrsib_fields())
+    # with open("nbu.csv") as csvf:
+    #     f = csv.DictReader(csvf)
+    #     for i in f:
+    #         new_i = i.copy()
+    #         new_i["h_t"] = datetime.fromtimestamp(int(i["t"]))
+    #         new_i["e"] = float(i["e"].replace(",", ".").strip())
+    #         new_i["d"] = float(i["d"].replace(",", ".").strip())
+    #         print(new_i)
+    #         write_to_csv("nbu.csv", CsvFiles.nbu_fields(), new_i)
+
+    # with open("ukrsib.csv") as csvf:
+    #     f = csv.DictReader(csvf)
+    #     for i in f:
+    #         new_i = {}
+    #         new_i["t"] = i["t"]
+    #         new_i["h_t"] = datetime.fromtimestamp(int(i["t"]))
+    #         new_i["e_b"] = float(i["e"].split(",")[0].replace("'", "")[1:])
+    #         new_i["e_s"] = float(i["e"].split(",")[1].replace("'", "")[:-1])
+    #         new_i["d_b"] = float(i["d"].split(",")[0].replace("'", "")[1:])
+    #         new_i["d_s"] = float(i["d"].split(",")[1].replace("'", "")[:-1])
+    #         new_i["e_card_b"] = float(i["e_card"].split(",")[0].replace("'", "")[1:])
+    #         new_i["e_card_s"] = float(i["e_card"].split(",")[1].replace("'", "")[:-1])
+    #         new_i["d_card_b"] = float(i["d_card"].split(",")[0].replace("'", "")[1:])
+    #         new_i["d_card_s"] = float(i["d_card"].split(",")[1].replace("'", "")[:-1])
+    #         print(new_i)
+    #         write_to_csv("ukrsib.csv", CsvFiles.ukrsib_fields(), new_i)

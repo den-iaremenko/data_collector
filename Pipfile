@@ -10,6 +10,7 @@ requests = "*"
 beautifulsoup4 = "*"
 loguru = "*"
 gitpython = "*"
+bokeh = "*"
 
 [requires]
 python_version = "3.7"
