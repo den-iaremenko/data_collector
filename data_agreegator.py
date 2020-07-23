@@ -8,8 +8,8 @@ from loguru import logger
 from git import Repo
 
 
-# date = datetime.now()
-# logger.add(f"file_{date.day}_{date.month}_{date.hour}_{date.minute}.log", retention="10 days")
+date = datetime.now()
+logger.add(f"file_{date.day}_{date.month}_{date.hour}_{date.minute}.log", retention="10 days")
 
 class CsvFiles:
 
@@ -173,8 +173,8 @@ if __name__ == "__main__":
         logger.info(f"Current time: {curr_datetime.hour}:{curr_datetime.minute}:{curr_datetime.second}")
         if curr_datetime.hour == 11 \
                 or curr_datetime.hour == 14 \
-                or curr_datetime.hour == 17 \
-                and curr_datetime.minute == 11:
+                or curr_datetime.hour == 18 \
+                and curr_datetime.minute == 00:
             run()
         sleep(sec_to_wait)
 
