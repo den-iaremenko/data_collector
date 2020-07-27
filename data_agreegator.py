@@ -172,10 +172,7 @@ if __name__ == "__main__":
     while True:
         curr_datetime = datetime.now()
         logger.info(f"Current time: {curr_datetime.hour}:{curr_datetime.minute}:{curr_datetime.second}")
-        if curr_datetime.hour == 11 \
-                or curr_datetime.hour == 14 \
-                or curr_datetime.hour == 18 \
-                and curr_datetime.minute == 00:
+        if curr_datetime.hour in [9, 10, 12, 14, 18, 20] and curr_datetime.minute == 00:
             run()
         sleep(sec_to_wait)
 
